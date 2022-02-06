@@ -7,7 +7,6 @@ import numpy as np
 from onnx import numpy_helper
 
 from onnx import helper
-from onnx import AttributeProto, TensorProto, GraphProto
 
 from mqbench.utils.logger import logger
 from mqbench.deploy.common import (
@@ -77,7 +76,7 @@ class OPENVINO_process(object):
                     qmax = qmax * 2 + 1
                     qmin = qmin * 2
                 output_name = node.output[0]
-                # Create a node (NodeProto)
+                # Create a node (FakeQuantize)
                 fakeq_inputnames = [item % tensor_name for item in ['input_min_%s', 'input_max_%s','output_min_%s','output_max_%s']]
                 node_def = helper.make_node(
                     'FakeQuantize', # node name
@@ -89,11 +88,11 @@ class OPENVINO_process(object):
                 )
                 node_defs.append(node_def)
                 scale = np.abs(np.asarray(scale, dtype=np.float64).reshape(-1))
-                zero_point = np.clip(np.asarray(np.round(zero_point), dtype=np.int64).reshape(-1), a_min=qmin, a_max=qmax)
+                zero_point = np.clip(np.asarray(np.round(zero_point), dtype=np.int32).reshape(-1), a_min=qmin, a_max=qmax)
                 
-                qrange = np.round(qmax) - np.round(qmin)
+                qrange = float(qmax - qmin)
                 input_range = scale * qrange
-                input_high = (np.round(qmax).astype(np.int64) - zero_point).astype(np.float64) * input_range / qrange
+                input_high = (qmax - zero_point).astype(np.float64) * input_range / qrange
                 input_low = input_high - input_range
                 input_low_size = input_low.size
 
@@ -124,7 +123,6 @@ class OPENVINO_process(object):
         for node in nodes_to_be_removed:
             graph.node.remove(node)
         graph.node.extend(node_defs)
-        # remove Conv bias and insert BN
         onnx_graph.topologize_graph()
         onnx_graph.prepare_initializer()
         onnx_graph.optimize_model()

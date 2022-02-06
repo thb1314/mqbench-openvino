@@ -94,7 +94,7 @@ class ObserverBase(_ObserverBase):
                 quant_min, quant_max = 0, qrange_len - 1
             if self.reduce_range:
                 quant_min, quant_max = quant_min // 2, quant_max // 2
-            if self.not_calc_quant_min_max and self.has_customized_qrange:
+            if self.not_calc_quant_min_max:
                 quant_min, quant_max = self.quant_min, self.quant_max
         else:
             # Fallback onto default 8-bit qmin and qmax calculation if dynamic range is not used.
