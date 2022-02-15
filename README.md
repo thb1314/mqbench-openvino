@@ -9,7 +9,7 @@
 
 > This is a copy of MQBench to support openvino
 >
-> Examples can be found in `exsamples/mqbench_openvino_test.ipynb`
+> Examples see `application/openvino_example.ipynb`
 
 
 
