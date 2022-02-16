@@ -11,4 +11,4 @@
 >
 > You can get lastest version in https://github.com/ModelTC/MQBench
 >
-> Notebook example : `application/openvino_example.ipynb`
+> Notebook example: `application/openvino_example.ipynb`
